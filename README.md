@@ -1,5 +1,8 @@
 # Grimoire of Blades — Nier Replicant Weapon Tracker
 
+Live deployment (you can use freely too)
+https://nier-replicant-weapon-tracker.vercel.app/
+
 A single-file, offline weapon checklist for **NieR Replicant ver.1.22474487139...**, built for players working toward Endings C, D, and E — which require every one of the game's 33 weapons to be collected before finishing a third playthrough.
 
 Spoiler-free: entries list only weapon names, how they're obtained, and general locations. No story events are described.
