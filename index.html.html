@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Grimoire of Blades — Nier Replicant Weapon Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink: #17140f;
+    --ink-2: #1f1b14;
+    --parchment: #ddd0b0;
+    --parchment-dim: #c3b48c;
+    --rust: #8a3324;
+    --rust-bright: #b3452f;
+    --gold: #b08d3e;
+    --gold-bright: #d4af5a;
+    --moss: #55624c;
+    --line: rgba(176,141,62,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse at 20% 0%, #241f16 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 100%, #241a14 0%, transparent 50%),
+      var(--ink);
+    color:var(--parchment);
+    font-family:'EB Garamond', serif;
+    min-height:100vh;
+    padding:32px 20px 64px;
+  }
+  .wrap{max-width:920px;margin:0 auto;}
+
+  /* header / seal */
+  header{
+    display:flex;
+    align-items:center;
+    gap:28px;
+    padding-bottom:22px;
+    border-bottom:1px solid var(--line);
+    margin-bottom:26px;
+    flex-wrap:wrap;
+  }
+  .seal{position:relative;width:104px;height:104px;flex:0 0 auto;}
+  .seal svg{width:100%;height:100%;transform:rotate(-90deg);}
+  .seal-bg{fill:none;stroke:rgba(176,141,62,0.18);stroke-width:5;}
+  .seal-fg{fill:none;stroke:var(--gold-bright);stroke-width:5;stroke-linecap:round;
+    transition:stroke-dashoffset 0.6s ease;}
+  .seal-label{
+    position:absolute;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    font-family:'Cinzel',serif;
+  }
+  .seal-label .n{font-size:22px;color:var(--gold-bright);line-height:1;}
+  .seal-label .d{font-size:10px;letter-spacing:1px;color:var(--parchment-dim);margin-top:2px;}
+
+  .title-block{flex:1;min-width:220px;}
+  h1{
+    font-family:'Cinzel',serif;
+    font-weight:600;
+    font-size:clamp(24px,4vw,34px);
+    letter-spacing:2px;
+    margin:0 0 6px;
+    color:var(--parchment);
+    text-transform:uppercase;
+  }
+  .subtitle{
+    font-style:italic;
+    color:var(--parchment-dim);
+    font-size:15px;
+    max-width:520px;
+    line-height:1.5;
+  }
+
+  /* controls */
+  .controls{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:24px;
+    align-items:center;
+  }
+  .seg{
+    display:flex;border:1px solid var(--line);border-radius:2px;overflow:hidden;
+  }
+  .seg button{
+    background:transparent;border:none;color:var(--parchment-dim);
+    font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;
+    padding:9px 16px;cursor:pointer;text-transform:uppercase;
+    border-right:1px solid var(--line);
+    transition:background 0.15s, color 0.15s;
+  }
+  .seg button:last-child{border-right:none;}
+  .seg button.active{background:var(--rust);color:var(--parchment);}
+  .seg button:hover:not(.active){background:rgba(176,141,62,0.12);color:var(--gold-bright);}
+
+  select{
+    background:var(--ink-2);
+    border:1px solid var(--line);
+    color:var(--parchment);
+    font-family:'EB Garamond',serif;
+    font-size:14px;
+    padding:9px 12px;
+    border-radius:2px;
+    cursor:pointer;
+  }
+
+  .reset-btn{
+    margin-left:auto;
+    background:transparent;
+    border:1px solid var(--rust);
+    color:var(--rust-bright);
+    font-family:'Cinzel',serif;
+    font-size:10px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    padding:9px 14px;
+    cursor:pointer;
+    border-radius:2px;
+  }
+  .reset-btn:hover{background:rgba(138,51,36,0.15);}
+
+  /* category groups */
+  .category{margin-bottom:8px;}
+  .cat-header{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    padding:10px 4px;
+    cursor:default;
+    border-bottom:1px solid var(--line);
+    margin-bottom:10px;
+  }
+  .cat-header .cat-name{
+    font-family:'Cinzel',serif;
+    font-size:13px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--gold-bright);
+  }
+  .cat-header .cat-count{
+    font-size:13px;
+    color:var(--parchment-dim);
+    font-style:italic;
+  }
+  .cat-header .cat-line{flex:1;height:1px;background:var(--line);}
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(270px,1fr));
+    gap:12px;
+    margin-bottom:28px;
+  }
+
+  .card{
+    background:linear-gradient(180deg, rgba(221,208,176,0.05), rgba(221,208,176,0.02));
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:14px 14px 12px;
+    position:relative;
+    transition:border-color 0.2s, background 0.2s, opacity 0.2s;
+    display:flex;
+    gap:12px;
+  }
+  .card.owned{
+    border-color:rgba(176,141,62,0.6);
+    background:linear-gradient(180deg, rgba(176,141,62,0.10), rgba(176,141,62,0.03));
+  }
+  .card.hidden{display:none;}
+
+  .check{
+    flex:0 0 auto;
+    width:22px;height:22px;
+    margin-top:2px;
+    border:1px solid var(--gold);
+    border-radius:1px;
+    background:transparent;
+    cursor:pointer;
+    position:relative;
+    transition:background 0.15s;
+  }
+  .check.checked{background:var(--gold);}
+  .check.checked::after{
+    content:"";
+    position:absolute;
+    left:6px;top:2px;
+    width:5px;height:10px;
+    border:solid var(--ink);
+    border-width:0 2px 2px 0;
+    transform:rotate(40deg);
+  }
+
+  .card-body{flex:1;min-width:0;}
+  .wname{
+    font-family:'Cinzel',serif;
+    font-size:14.5px;
+    letter-spacing:0.5px;
+    color:var(--parchment);
+    margin-bottom:4px;
+  }
+  .card.owned .wname{color:var(--gold-bright);}
+  .wmeta{
+    font-size:13.5px;
+    line-height:1.4;
+    color:var(--parchment-dim);
+  }
+  .wact{
+    display:inline-block;
+    margin-top:6px;
+    font-size:10px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:var(--moss);
+    border:1px solid rgba(85,98,76,0.5);
+    padding:2px 6px;
+    border-radius:2px;
+  }
+
+  footer{
+    text-align:center;
+    color:var(--parchment-dim);
+    font-style:italic;
+    font-size:12.5px;
+    margin-top:30px;
+    opacity:0.7;
+  }
+
+  @media (max-width:520px){
+    header{gap:16px;}
+    .seal{width:80px;height:80px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="seal">
+      <svg viewBox="0 0 100 100">
+        <circle class="seal-bg" cx="50" cy="50" r="42"></circle>
+        <circle class="seal-fg" id="sealFg" cx="50" cy="50" r="42" stroke-dasharray="264" stroke-dashoffset="264"></circle>
+      </svg>
+      <div class="seal-label">
+        <span class="n" id="sealCount">0/33</span>
+        <span class="d">SEALED</span>
+      </div>
+    </div>
+    <div class="title-block">
+      <h1>Grimoire of Blades</h1>
+      <div class="subtitle">Every weapon must be bound to your soul before the third turning of fate, so that Endings C, D and E may open. Mark what you carry — spoiler-free.</div>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div class="seg" id="statusSeg">
+      <button data-filter="all" class="active">All</button>
+      <button data-filter="missing">Missing</button>
+      <button data-filter="owned">Owned</button>
+    </div>
+    <select id="catSelect">
+      <option value="all">All categories</option>
+      <option value="story">Story — automatic</option>
+      <option value="purchase">Purchasable</option>
+      <option value="exploration">Found exploring</option>
+      <option value="sidequest">Sidequest reward</option>
+      <option value="nightmares">15 Nightmares (Route B)</option>
+    </select>
+    <button class="reset-btn" id="resetBtn">Reset checklist</button>
+  </div>
+
+  <div id="listRoot"></div>
+
+  <footer>33 blades total · progress is saved to this browser · data condensed from a spoiler-free weapons guide</footer>
+</div>
+
+<script>
+const WEAPONS = [
+  // STORY — automatic / guaranteed
+  {id:"nameless_blade", name:"Nameless Blade", cat:"story", act:"Act 1", info:"Your starting weapon. Already bound to you."},
+  {id:"moonrise", name:"Moonrise", cat:"story", act:"Act 1", info:"Given after helping a man under attack on the road to the Seafront."},
+  {id:"rebirth", name:"Rebirth", cat:"story", act:"Act 1", info:"Given after a major story event in Facade."},
+  {id:"kusanagi", name:"Kusanagi", cat:"story", act:"Act 2", info:"Already in your bag when Act 2 opens."},
+  {id:"transience", name:"Transience", cat:"story", act:"Act 2", info:"Already in your bag when Act 2 opens."},
+  {id:"ancient_overlord", name:"Ancient Overlord", cat:"story", act:"Act 2", info:"Given after a major story event in Facade."},
+  {id:"iron_will", name:"Iron Will", cat:"story", act:"Act 2", info:"Reward for finishing the main Junk Heap quest."},
+  {id:"iron_pipe", name:"Iron Pipe", cat:"story", act:"Act 2", info:"Arrives automatically before your third route — or earlier via the 'Magical Stone' side content."},
+
+  // PURCHASABLE
+  {id:"lily_leaf_sword", name:"Lily-Leaf Sword", cat:"purchase", act:"Act 1", info:"Village weapon shop."},
+  {id:"beastbain", name:"Beastbain", cat:"purchase", act:"Act 1", info:"Village weapon shop."},
+  {id:"earth_wyrms_claw", name:"Earth Wyrm's Claw", cat:"purchase", act:"Act 1", info:"Facade weapon shop."},
+  {id:"axe_of_beheading", name:"Axe of Beheading", cat:"purchase", act:"Act 2", info:"Village weapon shop."},
+  {id:"sunrise", name:"Sunrise", cat:"purchase", act:"Act 2", info:"Village or Aerie weapon shop."},
+  {id:"phoenix_dagger", name:"Phoenix Dagger", cat:"purchase", act:"Act 2", info:"Seafront weapon shop."},
+  {id:"vile_axe", name:"Vile Axe", cat:"purchase", act:"Act 2", info:"Seafront weapon shop."},
+  {id:"spear_of_usurper", name:"Spear of the Usurper", cat:"purchase", act:"Act 2", info:"Seafront weapon shop."},
+  {id:"captains_holy_spear", name:"Captain's Holy Spear", cat:"purchase", act:"Act 2", info:"Facade weapon shop."},
+  {id:"phoenix_spear", name:"Phoenix Spear", cat:"purchase", act:"Act 2", info:"Facade weapon shop."},
+
+  // FOUND EXPLORING
+  {id:"nirvana_dagger", name:"Nirvana Dagger", cat:"exploration", act:"Act 1", info:"Tucked in a box on the upper level of the Lost Shrine."},
+  {id:"blade_of_treachery", name:"Blade of Treachery", cat:"exploration", act:"Act 1", info:"Inside Emil's Mansion, near the save point before a boss fight."},
+  {id:"fang_of_the_twins", name:"Fang of the Twins", cat:"exploration", act:"Act 2", info:"In a box in the underground area of Emil's Mansion."},
+  {id:"devil_queen", name:"The Devil Queen", cat:"exploration", act:"Act 2", info:"Box near a ladder along the Lost Shrine's rear path."},
+  {id:"beastlord", name:"Beastlord", cat:"exploration", act:"Act 2", info:"Box on the Lost Shrine rooftops."},
+  {id:"beastcurse", name:"Beastcurse", cat:"exploration", act:"Act 2", info:"Box in the Junk Heap, just before a boss fight."},
+  {id:"phoenix_sword", name:"Phoenix Sword", cat:"exploration", act:"Late game", info:"Box in the very first room of the game's final dungeon."},
+  {id:"dragoon_lance", name:"Dragoon Lance", cat:"exploration", act:"Late game", info:"Box just before a spiral staircase in the final dungeon."},
+
+  // SIDEQUEST REWARDS
+  {id:"faith", name:"Faith", cat:"sidequest", act:"Act 1", info:"Finish every text-adventure side story in the Forest of Myth, then speak with the village mayor."},
+  {id:"labyrinths_whisper", name:"Labyrinth's Whisper", cat:"sidequest", act:"Act 2", info:"Complete the village sidequest 'A Bridge in Peril'."},
+  {id:"labyrinths_song", name:"Labyrinth's Song", cat:"sidequest", act:"Act 2", info:"Complete Facade's 'A Shade Entombed', which unlocks 'Disturbing the Sleep of Kings' — finish that too."},
+  {id:"labyrinths_shout", name:"Labyrinth's Shout", cat:"sidequest", act:"Act 2", info:"Complete the village sidequest 'The Damaged Map' (you'll need to track down Machine Oil along the way)."},
+
+  // 15 NIGHTMARES (Route B)
+  {id:"fools_embrace", name:"Fool's Embrace", cat:"nightmares", act:"Route B", info:"Clear the 3rd battle of the first set of five in the 15 Nightmares arena."},
+  {id:"fools_lament", name:"Fool's Lament", cat:"nightmares", act:"Route B", info:"Clear the 3rd battle of the second set of five in the 15 Nightmares arena."},
+  {id:"fools_accord", name:"Fool's Accord", cat:"nightmares", act:"Route B", info:"Clear the 3rd battle of the third set of five in the 15 Nightmares arena."},
+];
+
+const CAT_LABELS = {
+  story: "Story — automatic",
+  purchase: "Purchasable",
+  exploration: "Found exploring",
+  sidequest: "Sidequest reward",
+  nightmares: "15 Nightmares (Route B)"
+};
+const CAT_ORDER = ["story","purchase","exploration","sidequest","nightmares"];
+
+let owned = {};
+let statusFilter = "all";
+let catFilter = "all";
+
+const STORAGE_KEY = "nier-replicant-weapons-owned";
+
+function loadOwned(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    owned = raw ? JSON.parse(raw) : {};
+  }catch(e){
+    owned = {};
+  }
+}
+
+function saveOwned(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(owned));
+  }catch(e){
+    console.error("Could not save progress", e);
+  }
+}
+
+function toggle(id){
+  owned[id] = !owned[id];
+  saveOwned();
+  render();
+}
+
+function render(){
+  const total = WEAPONS.length;
+  const count = WEAPONS.filter(w => owned[w.id]).length;
+
+  document.getElementById("sealCount").textContent = count + "/" + total;
+  const circumference = 264;
+  const offset = circumference - (count/total)*circumference;
+  document.getElementById("sealFg").style.strokeDashoffset = offset;
+
+  const root = document.getElementById("listRoot");
+  root.innerHTML = "";
+
+  CAT_ORDER.forEach(cat => {
+    if(catFilter !== "all" && catFilter !== cat) return;
+    const items = WEAPONS.filter(w => w.cat === cat).filter(w => {
+      if(statusFilter === "owned") return !!owned[w.id];
+      if(statusFilter === "missing") return !owned[w.id];
+      return true;
+    });
+    if(items.length === 0) return;
+
+    const catCountAll = WEAPONS.filter(w => w.cat === cat).length;
+    const catCountOwned = WEAPONS.filter(w => w.cat === cat && owned[w.id]).length;
+
+    const section = document.createElement("div");
+    section.className = "category";
+    section.innerHTML = `
+      <div class="cat-header">
+        <span class="cat-name">${CAT_LABELS[cat]}</span>
+        <div class="cat-line"></div>
+        <span class="cat-count">${catCountOwned}/${catCountAll}</span>
+      </div>
+    `;
+
+    const grid = document.createElement("div");
+    grid.className = "grid";
+
+    items.forEach(w => {
+      const isOwned = !!owned[w.id];
+      const card = document.createElement("div");
+      card.className = "card" + (isOwned ? " owned" : "");
+      card.innerHTML = `
+        <div class="check ${isOwned ? "checked" : ""}" data-id="${w.id}"></div>
+        <div class="card-body">
+          <div class="wname">${w.name}</div>
+          <div class="wmeta">${w.info}</div>
+          <span class="wact">${w.act}</span>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+
+    section.appendChild(grid);
+    root.appendChild(section);
+  });
+
+  if(root.children.length === 0){
+    root.innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--parchment-dim);font-style:italic;">No blades match this filter.</div>`;
+  }
+
+  document.querySelectorAll(".check").forEach(el => {
+    el.addEventListener("click", () => toggle(el.dataset.id));
+  });
+}
+
+document.getElementById("statusSeg").addEventListener("click", (e) => {
+  const btn = e.target.closest("button");
+  if(!btn) return;
+  statusFilter = btn.dataset.filter;
+  document.querySelectorAll("#statusSeg button").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  render();
+});
+
+document.getElementById("catSelect").addEventListener("change", (e) => {
+  catFilter = e.target.value;
+  render();
+});
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  if(confirm("Clear your entire weapon checklist?")){
+    owned = {};
+    saveOwned();
+    render();
+  }
+});
+
+loadOwned();
+render();
+</script>
+</body>
+</html>
