@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Grimoire of Blades — Nier Replicant Weapon Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
@@ -19,6 +20,7 @@
     --line: rgba(176,141,62,0.35);
   }
   *{box-sizing:border-box;}
+  html{ -webkit-text-size-adjust:100%; }
   html,body{margin:0;padding:0;}
   body{
     background:
@@ -28,9 +30,14 @@
     color:var(--parchment);
     font-family:'EB Garamond', serif;
     min-height:100vh;
+    min-height:100dvh;
     padding:32px 20px 64px;
+    padding-left:max(20px, env(safe-area-inset-left));
+    padding-right:max(20px, env(safe-area-inset-right));
+    padding-bottom:max(64px, calc(32px + env(safe-area-inset-bottom)));
+    overflow-x:hidden;
   }
-  .wrap{max-width:920px;margin:0 auto;}
+  .wrap{max-width:920px;margin:0 auto;width:100%;}
 
   /* header / seal */
   header{
@@ -55,15 +62,17 @@
   .seal-label .n{font-size:22px;color:var(--gold-bright);line-height:1;}
   .seal-label .d{font-size:10px;letter-spacing:1px;color:var(--parchment-dim);margin-top:2px;}
 
-  .title-block{flex:1;min-width:220px;}
+  .title-block{flex:1;min-width:min(100%, 220px);}
   h1{
     font-family:'Cinzel',serif;
     font-weight:600;
-    font-size:clamp(24px,4vw,34px);
+    font-size:clamp(22px,5.5vw,34px);
     letter-spacing:2px;
     margin:0 0 6px;
     color:var(--parchment);
     text-transform:uppercase;
+    line-height:1.2;
+    overflow-wrap:anywhere;
   }
   .subtitle{
     font-style:italic;
@@ -90,6 +99,8 @@
     padding:9px 16px;cursor:pointer;text-transform:uppercase;
     border-right:1px solid var(--line);
     transition:background 0.15s, color 0.15s;
+    min-height:44px;
+    -webkit-tap-highlight-color:transparent;
   }
   .seg button:last-child{border-right:none;}
   .seg button.active{background:var(--rust);color:var(--parchment);}
@@ -100,10 +111,12 @@
     border:1px solid var(--line);
     color:var(--parchment);
     font-family:'EB Garamond',serif;
-    font-size:14px;
+    font-size:16px;
     padding:9px 12px;
     border-radius:2px;
     cursor:pointer;
+    min-height:44px;
+    max-width:100%;
   }
 
   .reset-btn{
@@ -118,6 +131,8 @@
     padding:9px 14px;
     cursor:pointer;
     border-radius:2px;
+    min-height:44px;
+    -webkit-tap-highlight-color:transparent;
   }
   .reset-btn:hover{background:rgba(138,51,36,0.15);}
 
@@ -138,17 +153,19 @@
     letter-spacing:2px;
     text-transform:uppercase;
     color:var(--gold-bright);
+    overflow-wrap:anywhere;
   }
   .cat-header .cat-count{
     font-size:13px;
     color:var(--parchment-dim);
     font-style:italic;
+    flex-shrink:0;
   }
-  .cat-header .cat-line{flex:1;height:1px;background:var(--line);}
+  .cat-header .cat-line{flex:1;height:1px;background:var(--line);min-width:16px;}
 
   .grid{
     display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(270px,1fr));
+    grid-template-columns:repeat(auto-fill,minmax(min(100%, 270px),1fr));
     gap:12px;
     margin-bottom:28px;
   }
@@ -162,6 +179,9 @@
     transition:border-color 0.2s, background 0.2s, opacity 0.2s;
     display:flex;
     gap:12px;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
   }
   .card.owned{
     border-color:rgba(176,141,62,0.6);
@@ -171,7 +191,7 @@
 
   .check{
     flex:0 0 auto;
-    width:22px;height:22px;
+    width:24px;height:24px;
     margin-top:2px;
     border:1px solid var(--gold);
     border-radius:1px;
@@ -179,12 +199,13 @@
     cursor:pointer;
     position:relative;
     transition:background 0.15s;
+    pointer-events:none;
   }
   .check.checked{background:var(--gold);}
   .check.checked::after{
     content:"";
     position:absolute;
-    left:6px;top:2px;
+    left:7px;top:3px;
     width:5px;height:10px;
     border:solid var(--ink);
     border-width:0 2px 2px 0;
@@ -198,12 +219,14 @@
     letter-spacing:0.5px;
     color:var(--parchment);
     margin-bottom:4px;
+    overflow-wrap:anywhere;
   }
   .card.owned .wname{color:var(--gold-bright);}
   .wmeta{
     font-size:13.5px;
-    line-height:1.4;
+    line-height:1.45;
     color:var(--parchment-dim);
+    overflow-wrap:anywhere;
   }
   .wact{
     display:inline-block;
@@ -224,11 +247,76 @@
     font-size:12.5px;
     margin-top:30px;
     opacity:0.7;
+    line-height:1.5;
+    padding:0 4px;
   }
 
-  @media (max-width:520px){
-    header{gap:16px;}
-    .seal{width:80px;height:80px;}
+  @media (max-width:640px){
+    body{
+      padding:20px 14px 48px;
+      padding-left:max(14px, env(safe-area-inset-left));
+      padding-right:max(14px, env(safe-area-inset-right));
+      padding-bottom:max(48px, calc(24px + env(safe-area-inset-bottom)));
+    }
+    header{
+      gap:14px 18px;
+      align-items:flex-start;
+      margin-bottom:20px;
+      padding-bottom:18px;
+    }
+    .seal{width:72px;height:72px;}
+    .seal-label .n{font-size:16px;}
+    .seal-label .d{font-size:8px;letter-spacing:0.5px;}
+    .title-block{min-width:0;flex:1 1 calc(100% - 90px);}
+    h1{letter-spacing:1px;}
+    .subtitle{font-size:14px;}
+
+    .controls{
+      flex-direction:column;
+      align-items:stretch;
+      gap:8px;
+      margin-bottom:20px;
+    }
+    .seg{width:100%;}
+    .seg button{
+      flex:1;
+      padding:10px 8px;
+      font-size:10px;
+      letter-spacing:0.5px;
+    }
+    select{width:100%;}
+    .reset-btn{
+      margin-left:0;
+      width:100%;
+    }
+
+    .cat-header{
+      flex-wrap:wrap;
+      gap:6px 10px;
+      padding:8px 2px;
+    }
+    .cat-header .cat-name{
+      font-size:11px;
+      letter-spacing:1px;
+      flex:1 1 auto;
+    }
+    .cat-header .cat-line{order:3;flex:1 1 100%;}
+
+    .grid{
+      grid-template-columns:1fr;
+      gap:10px;
+      margin-bottom:22px;
+    }
+    .card{padding:12px;gap:12px;}
+    .wname{font-size:14px;}
+    .wmeta{font-size:13px;}
+  }
+
+  @media (max-width:380px){
+    .seal{width:64px;height:64px;}
+    .seal-label .n{font-size:14px;}
+    h1{font-size:20px;letter-spacing:0.5px;}
+    .seg button{padding:10px 4px;font-size:9px;}
   }
 </style>
 </head>
@@ -399,14 +487,25 @@ function render(){
       const isOwned = !!owned[w.id];
       const card = document.createElement("div");
       card.className = "card" + (isOwned ? " owned" : "");
+      card.setAttribute("role", "checkbox");
+      card.setAttribute("aria-checked", isOwned ? "true" : "false");
+      card.setAttribute("tabindex", "0");
+      card.dataset.id = w.id;
       card.innerHTML = `
-        <div class="check ${isOwned ? "checked" : ""}" data-id="${w.id}"></div>
+        <div class="check ${isOwned ? "checked" : ""}" aria-hidden="true"></div>
         <div class="card-body">
           <div class="wname">${w.name}</div>
           <div class="wmeta">${w.info}</div>
           <span class="wact">${w.act}</span>
         </div>
       `;
+      card.addEventListener("click", () => toggle(w.id));
+      card.addEventListener("keydown", (e) => {
+        if(e.key === "Enter" || e.key === " "){
+          e.preventDefault();
+          toggle(w.id);
+        }
+      });
       grid.appendChild(card);
     });
 
@@ -417,10 +516,6 @@ function render(){
   if(root.children.length === 0){
     root.innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--parchment-dim);font-style:italic;">No blades match this filter.</div>`;
   }
-
-  document.querySelectorAll(".check").forEach(el => {
-    el.addEventListener("click", () => toggle(el.dataset.id));
-  });
 }
 
 document.getElementById("statusSeg").addEventListener("click", (e) => {
